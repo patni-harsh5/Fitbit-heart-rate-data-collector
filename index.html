@@ -1,17 +1,170 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>FitMe Application</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+		<title>HeartRate-Capture</title>
+        
+    <link rel="stylesheet" href="css/style.css" type="text/css">
+	<link rel="stylesheet" type="text/css" href="css/mobile.css">
+	    
+    <style>
+        table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+    </style>
+        
+        <style>
+            .button {
+    background-color: #555555;
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+}
+
+        </style>
+        
+        <script>
+function drawchart(data) {
+        var values = new Array();
+        
+console.log("data inside draw chart = " + JSON.stringify(data));
+    var len = data["activities-heart-intraday"].dataset.length;
+    console.log(len);
+    for(i = len-300; i<len; i++){
+        console.log(data["activities-heart-intraday"].dataset[i].value);
+                var val = data["activities-heart-intraday"].dataset[i].value;
+               // var time = data["activities-heart-intraday"].dataset[i].time;
+         
+        var obj = {
+        y: val,
+            
+    }    
+        console.log("Obj" + JSON.stringify(obj.y));
+            values.push(obj);
+    }
+    
+   
+    
+    
+        values.push(obj);
+
+     console.log(JSON.stringify(values));
+    
+var chart = new CanvasJS.Chart("chartContainer", {
+	animationEnabled: true,
+	theme: "light2",
+	title:{
+		text: "Heart Rate"
+	},
+	axisY:{
+		includeZero: false
+	},
+	data: [{        
+		type: "line",       
+		dataPoints: values
+	}]
+});
+chart.render();
+
+}
+</script>
+        
+        
+        
 	</head>
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-	<script src="app.js">
+ <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+
+
+    
+	<script>
+        $(document).ready(function(){
+    $("#btn1").click(function(){
+console.log("Inside Click Function");
+      //
+       'use strict';
+      // // get the url
+       var url = window.location.href;
+      // //getting the access token from url
+       var access_token = url.split("#")[1].split("=")[1].split("&")[0];
+      // // get the userid
+       var userId = url.split("#")[1].split("=")[2].split("&")[0];
+       console.log('access_token = ' + access_token);
+
+       console.log('userId = ' + userId);
+
+       $.ajax({
+  type: 'GET',
+  beforeSend: function(request) {
+     request.setRequestHeader("Authorization", 'Bearer ' + access_token);
+  },
+    url: "https://api.fitbit.com/1/user/"+userId+"/activities/heart/date/today/1d/1sec.json",
+    
+        success: function(data, status, xhr){
+        drawchart(data, len);
+        var len = data["activities-heart-intraday"].dataset.length - 1;
+       //console.log(len);
+        //console.log(JSON.stringify(data["activities-heart-intraday"].dataset.length));
+        //console.log(data["activities-heart-intraday"].dataset[len].value);
+        var heartrate = data["activities-heart-intraday"].dataset[len].value;
+      document.getElementById("heart").innerHTML = JSON.stringify(heartrate);
+        
+        var time = data["activities-heart-intraday"].dataset[len].time;
+        document.getElementById("moment").innerHTML = JSON.stringify(time);
+        
+        
+    }
+});
+
+
+    });
+
+});
+
+        
 	</script>
 	<body>
+        
+        <div><h1 align="center">Fitme</h1></div>
+        
 		<!-- code goes here -->
-		<a href="https://www.fitbit.com/oauth2/authorize?response_type=token&client_id=22CN8P&redirect_uri=http%3A%2F%2F192.168.43.187%2FFitme&scope=activity%20heartrate%20location%20nutrition%20profile%20settings%20sleep%20social%20weight&expires_in=604800">
-		Login To Fitbit
+		<a href="https://www.fitbit.com/oauth2/authorize?response_type=token&client_id=22CN8P&redirect_uri=http%3A%2F%2F192.168.64.2%2FFitme%2F&scope=activity%20heartrate%20location%20nutrition%20profile%20settings%20sleep%20social%20weight&expires_in=604800">
+            Login To Fitbit
 	 </a>
-	 <button id="btn1">Get Data</button>
+	 
+    <input  id="btn1" type="button" class="button" value="Get Data" onload="drawchart()">
 
+        <br />
+        
+<div id="chartContainer" style="height: 300px; width: 100%;"></div>
+<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+    
+        <br />
+        
+   <p id="demo"></p>
+        
+        <br />
+        
+        
+        <div style="margin: auto;width: 80%;height: 300px;border: 3px solid #73AD21;padding: 10px;background-color: indianred">
+            
+            <p style="font-size: 200px;margin: auto;text-align: center" id="heart"> N/A</p><p id="moment"></p>
+            
+        </div>
+        
+        
+   
+        
+        
+        
 	</body>
 </html>
